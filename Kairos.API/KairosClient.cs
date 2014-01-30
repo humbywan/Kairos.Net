@@ -141,7 +141,7 @@ namespace Kairos.API
         /// <param name="topLeftY">The y coordinate of the face location</param>
         /// <param name="width">The width of the image area</param>
         /// <param name="height">The height of the image area</param>
-        /// <returns></returns>
+        /// <returns>The recognition response with the possible matches</returns>
         public Kairos.API.RecognizeResponse Recognize(string imageId, int topLeftX, int topLeftY, int width, int height)
         {
             var client = new RestClient(API_BASE_URL);
@@ -161,6 +161,24 @@ namespace Kairos.API
 
             // Return the response
             return requestResponse.Data;
+        }
+
+        /// <summary>
+        /// Recognizes a previously detected/enrolled image in the system 
+        /// </summary>
+        /// <param name="imageUrl">The image ID</param>
+        /// <returns>The recognition response with the possible matches</returns>
+        public Kairos.API.RecognizeResponse Recognize(string imageUrl)
+        {
+            // Detect the image information
+            var detectResponse = this.Detect(imageUrl);
+
+            // Get the image and face information
+            var detectImage = detectResponse.Images[0];
+            var face = detectImage.Faces[0];
+
+            // Recognize faces
+            return this.Recognize(detectImage.image_id, face.topLeftX, face.topLeftY, face.width, face.height);
         }
     }
 }
